@@ -1,0 +1,22 @@
+Package: scrapigeons
+Type: Package
+Title: Scrapes race data from the American Racing Pigeons Union Website
+Version: 0.1.0
+Authors@R: person("Tiago", "Cabaço", email = "tiago.joao.cabaco@gmail.com",
+  role = c("aut", "cre"))
+Description: Package   that implements functions to scrape racing data from ARPU 
+    website. It is build around the functionality of RSelelinum API to 
+    interactevely scrape every race table stored on the National Race Datababse. 
+    It also provides pre-processing functions and generates a desired curated 
+    data set.  
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr, 
+    furrr, 
+    purrr, 
+    RSelenium,
+    rvest,
+    stringr, 
+    xml2

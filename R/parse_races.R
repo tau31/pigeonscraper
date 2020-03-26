@@ -156,6 +156,7 @@ race_table_parse <-
 #' and \code{race_info}
 #'
 #' @importFrom rlang .data
+#' @importFrom stringr fixed
 
 assemble_tbl <- function(
   races_xml,
@@ -258,9 +259,11 @@ assemble_tbl <- function(
           race_id =  stringr::str_c(
             .data$organization %>%
               stringr::str_replace_all(
-                stringr::fixed(" "), replacement = "_") %>%
+                fixed(" "),
+                replacement = "_") %>%
               stringr::str_replace_all(
-                stringr::fixed("_-_"), replacement = "_") %>%
+                fixed("_-_"),
+                replacement = "_") %>%
               stringr::str_to_lower(),
             "_race_",
             i

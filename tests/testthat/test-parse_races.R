@@ -32,3 +32,19 @@ test_that("race_table_parse outputs xml document with table", {
   expect_match(names(table_test)[3], regexp = "Section")
 })
 
+
+# Assemble race tables from xml documents ----
+
+raw_tbls <- assemble_tbl(races_xml = xml_doc,css_query_tbl = css_query_tbl)
+
+test_that("assemble_tbl generates a nested list with two tables as output", {
+  expect_equal(length(raw_tbls[[1]]), 2)
+})
+
+test_that("Table names should be race_results_tbl and race_info_tbl", {
+  expect_match(names(raw_tbls[[1]])[1],regexp = c("race_results_tbl"))
+  expect_match(names(raw_tbls[[1]])[2],regexp = c("race_info_tbl"))
+})
+
+
+

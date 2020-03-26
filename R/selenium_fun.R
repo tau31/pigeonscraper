@@ -19,10 +19,6 @@ start_chrome_remDr <- function(kill = TRUE) {
 
 # connect to remote driver ---------------------------
 
-# This function assumes a docke r container was proviously set up.
-# I connects R to the docker container and creates the remDr object that
-# ... we can use to interact with websites
-
 #' Connect to remote driver
 #'
 #' This function assumes a docker container was proviously started using
@@ -81,3 +77,34 @@ do_remDr <- function(remDr, link, FUN, FUN_input) {
   return(FUN_output)
 }
 
+
+# Get page source ---------------
+
+#' Get htlm page source
+#'
+#' Function to instruct loaded remote driver to connect to url and download page
+#' source. Note that indiviual download of source html wihthin each specific
+#' query is handled diferently.
+#'
+#' @param remDr remote driver connection
+#' @param link link to the desired webpage
+#'
+#' @return parsed html file.
+
+get_page_source <- function(remDr, link) {
+
+  # open server connection
+  remDr$open(silent = TRUE)
+
+  # set a timeout
+  remDr$setTimeout(type = "Implicit", milliseconds = 5000)
+
+  # navigate to the website
+  remDr$navigate(url = link)
+  Sys.sleep(3)
+
+  # function to do something on the url
+  source_html <- remDr$getPageSource()[[1]]
+  parsed_html <- xml2::read_html(source_html)
+  return(parsed_html)
+}

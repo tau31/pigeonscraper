@@ -12,13 +12,17 @@ Description: Package   that implements functions to scrape racing data from ARPU
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Suggests:
+    testthat (>= 2.1.0)
 Imports:
     dplyr, 
     furrr,
     lubridate,
     purrr, 
+    rlang,
     RSelenium,
     rvest,
-    stringr, 
+    stringr,
+    tibble,
     xml2
 RoxygenNote: 6.1.1

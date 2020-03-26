@@ -45,6 +45,3 @@ test_that("Table names should be race_results_tbl and race_info_tbl", {
   expect_match(names(raw_tbls[[1]])[1],regexp = c("race_results_tbl"))
   expect_match(names(raw_tbls[[1]])[2],regexp = c("race_info_tbl"))
 })
-
-
-

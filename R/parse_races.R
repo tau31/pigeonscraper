@@ -243,7 +243,10 @@ assemble_tbl <- function(
           raw_release_weather =
             rvest::html_node(
               race,
-              css = ".race-results > div:nth-child(1) > div:nth-child(1) > div:nth-child(2)"
+              css = paste(
+                ".race-results > div:nth-child(1)",
+                "> div:nth-child(1) > div:nth-child(2)",
+                sep = "")
             ) %>%
             rvest::html_text(),
           # html is defected, have to copy the whole file and fix latter
@@ -285,4 +288,84 @@ assemble_tbl <- function(
       return(output)
     })
   return(temp_tidy_tbls)
+}
+
+# Table pre-processing -------
+
+
+#' Table pre-process and aggregation by organization and by year
+#'
+#' @param tbls_list list of tables generated from \code{\link{assemble_tbl}}.
+#'
+#' @return list of tables by year and organization containing both iformation on
+#' individual races and results for each pigeon entry in an individual race.
+#'
+#' @importFrom rlang .data
+
+pre_process_tbls <- function(tbls_list) {
+  . <- NULL
+  tbls <-
+    list(
+      ##### Bind rows for race_info ####
+      "race_info" = purrr::map_dfr(
+        tbls_list,
+        function(i) {
+          i$race_info_tbl
+        }),
+      ##### Pre-process and bind rows for race_results ####
+      "race_results" = purrr::map(
+        tbls_list,
+        function(i) {
+          temp_tbl <- i$race_results_tbl
+
+          temp_tbl <- temp_tbl %>%
+            dplyr::mutate_all (as.character)
+
+          temp_tbl <- temp_tbl %>%
+            dplyr::arrange(.data$race_id) %>%
+            dplyr::rename(
+              to_win = .data$`To Win`,
+              ndb_points = .data$`WS Points`
+            )
+
+          temp_tbl <- temp_tbl %>%
+            dplyr::mutate(Pos = as.integer(.data$Pos),
+                   Section = dplyr::case_when(
+                     .data$Section == "" ~ NA_character_,
+                     .data$Section == "NA" ~ NA_character_,
+                     TRUE ~ .data$Section
+                   ),
+                   # Arrival = Arrival %>% lubridate::hms()
+                   Miles = as.numeric(.data$Miles),
+                   # to_win = as.numeric(to_win),
+                   YPM = as.numeric(.data$YPM),
+                   bird_birth_year = purrr::pmap_chr(
+                     list(.data$Band),
+                     function(b) {
+                       stringr::str_split(b, pattern = " ", simplify = TRUE)[3]
+                     }
+                   ),
+                   bird_national_org = purrr::pmap_chr(
+                     list(.data$Band),
+                     function(b) {
+                       stringr::str_split(b, pattern = " ", simplify = TRUE)[2]
+                     }
+                   ),
+                   bird_club_code = stringr::str_c(
+                     .data$bird_national_org,
+                     purrr::pmap_chr(
+                       list(.data$Band),
+                       function(b) {
+                         stringr::str_split(b, pattern = " ", simplify = TRUE)[4]
+                       }
+                     ),
+                     sep = "_"
+                   ))
+          temp_tbl <- temp_tbl %>%
+            dplyr::select(-.data$n, -.data$`NDB Points`)
+
+          return(temp_tbl)
+        }) %>% do.call("rbind", .)
+    )
+  return(tbls)
 }

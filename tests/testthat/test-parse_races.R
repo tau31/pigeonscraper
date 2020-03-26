@@ -10,7 +10,7 @@ years <- extract_years(parsed_html = page_source)
 css_query_tbl <- extract_orgs(years[1,], remDr = remDr)[1,]
 
 # Extract race options ------------------
-race_html <- extract_race_table_html(css_query_tbl = css_query_tbl,
+race_html <- extract_race_html_options(css_query_tbl = css_query_tbl,
                                      remDr = remDr)
 
 test_that("parsed races html have text on option fields", {

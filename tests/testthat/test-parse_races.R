@@ -18,9 +18,9 @@ test_that("parsed races html have text on option fields", {
 })
 
 # Generate xml documents with tables to be parsed ---------------
+xml_doc <-race_table_parse(race_xml_nodeset = race_html[[1]], remDr= remDr)
 
 test_that("race_table_parse outputs xml document with table", {
-  xml_doc <-race_table_parse(race_xml_nodeset = race_html[[1]], remDr= remDr)
   table_test <-
     xml_doc[[1]] %>%
     rvest::html_nodes("table") %>%

@@ -142,3 +142,144 @@ race_table_parse <-
       } # map function
     ) # map
   }
+
+# Assemble race tables from xml documents -----
+
+#' Assembre race tables from xml documents
+#'
+#' @param races_xml xml documents with race tables geneerated from
+#' \code{\link{race_table_parse}}.
+#' @param css_query_tbl individual css_query table used to access the
+#'  individual race
+#'
+#' @return \code{list} with two tables: \code{race_results}
+#' and \code{race_info}
+#'
+#' @importFrom rlang .data
+
+assemble_tbl <- function(
+  races_xml,
+  css_query_tbl) {
+  . <- NULL
+
+  seq_xml_docs <- 1:length(races_xml)
+
+  temp_tidy_tbls <- purrr::map(
+    seq_xml_docs,
+    function(i) {
+      # i = 1
+      race <- races_xml[[i]]
+
+
+      ### Solution for 0 valued table
+      ### To me, the solution will to check if this is 0 valued table.
+      ### If so, return empty tables with race_id and NA for all the rest.
+      ### Might be important for the acount of how many races there are by
+      ### Organization
+
+      #### create race_results table ####
+      race_results_tbl <-   race %>%
+        rvest::html_nodes("table") %>%
+        rvest::html_table(fill = TRUE)  %>%
+        .[[1]]   %>%
+        tibble::as_tibble()
+
+      if (nrow(race_results_tbl) > 0) {
+        race_results_tbl <-
+          race_results_tbl %>%
+          dplyr::mutate(
+            n = 1:n()
+          )
+
+        ##### Test if table contains summary rows ####
+        # some tables will have summary rows for best performing birds by loft.
+        # below I test if this is the case and if so, remove the corresponding rows
+        # ... and the ones bellow it.
+
+        test_below <-
+          race_results_tbl %>%
+          dplyr::filter(stringr::str_detect(.data$Pos, "Below"))
+
+
+        if (test_below %>% tally > 0) {
+          limit = test_below$n - 1
+          race_results_tbl <-
+            race_results_tbl %>%
+            dplyr::filter(between(row_number(), 1, limit))
+        }
+        ### Create race_info table ####
+        # this is a mixture of info present at:
+        # .... - the css_query_css_query_tbl object
+        # .... - scrapping info from the race specific headed on the website
+        # For both the css paths and xpath I used Firefox developers tools
+        # I also create a unique key for each race based on
+        # ... the race organization, year and the race list position
+
+      } else {
+        race_results_tbl <- race_results_tbl[1,]
+
+        race_results_tbl <-
+          race_results_tbl %>%
+          dplyr::mutate_all(as.character) %>%
+          dplyr::mutate(n = NA_character_)
+      }
+
+
+      race_info_tbl <-
+        tibble::tibble(
+          year = css_query_tbl$year,
+          organization = css_query_tbl$organization,
+          org_number = css_query_tbl$org_number,
+          date = rvest::html_nodes(race, "#race-selection") %>%
+            rvest::html_children() %>%
+            rvest::html_attr("data-date") %>%
+            .[i] %>%
+            lubridate::mdy(),
+          raw_location =  rvest::html_nodes(race, "#race-selection") %>%
+            rvest::html_children() %>%
+            rvest::html_attr("data-id") %>%
+            .[i],
+          raw_release_weather =
+            rvest::html_node(
+              race,
+              css = ".race-results > div:nth-child(1) > div:nth-child(1) > div:nth-child(2)"
+            ) %>%
+            rvest::html_text(),
+          # html is defected, have to copy the whole file and fix latter
+          raw_arrival_weather = rvest::html_node(
+            race,
+            xpath = "/html/body/div[3]/div[2]/div/div") %>%
+            rvest::html_text(),
+          raw_text = rvest::html_node(
+            race,
+            xpath = "/html/body/div[3]/div[2]"
+          ) %>%
+            rvest::html_text(),
+          race_id =  stringr::str_c(
+            .data$organization %>%
+              stringr::str_replace_all(
+                stringr::fixed(" "), replacement = "_") %>%
+              stringr::str_replace_all(
+                stringr::fixed("_-_"), replacement = "_") %>%
+              stringr::str_to_lower(),
+            "_race_",
+            i
+          )
+        ) %>%
+        dplyr::select(.data$race_id, everything())
+
+      #### Add unique identifier to the restuls table ####
+      race_results_tbl <-
+        race_results_tbl %>%
+        dplyr::mutate(race_id = race_info_tbl$race_id) %>%
+        dplyr::select(.data$race_id, everything())
+
+      #### Generate output####
+      output <- list(
+        "race_results_tbl" = race_results_tbl,
+        "race_info_tbl" = race_info_tbl
+      )
+      return(output)
+    })
+  return(temp_tidy_tbls)
+}

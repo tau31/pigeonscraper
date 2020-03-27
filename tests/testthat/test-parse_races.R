@@ -48,5 +48,21 @@ test_that("Table names should be race_results_tbl and race_info_tbl", {
 test_that("Elements of list are both data frames",  {
   expect_s3_class(raw_tbls[[1]]$race_results_tbl, "data.frame")
   expect_s3_class(raw_tbls[[1]]$race_info_tbl, "data.frame")
-
 })
+
+# Table pre-processing ------
+tbls_list <- pre_process_tbls(raw_tbls)
+
+test_that("race_info table is a data frame",  {
+  expect_s3_class(tbls_list$race_info, "data.frame")
+})
+
+test_that("race_results table is a data frame",  {
+  expect_s3_class(tbls_list$race_results, "data.frame")
+})
+
+test_that("tables have at least one row", {
+  rows <- purrr::map_dbl(tbls_list, nrow)
+  expect_gt(sum(rows), 1)
+})
+

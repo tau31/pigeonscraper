@@ -48,6 +48,9 @@ pigeon_scrapper <-
   function(css_query_entry,
            remDr) {
 
+    remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
+
+    Sys.sleep(2)
     # Extract race html options
     race_html <- extract_race_html_options(css_query_tbl = css_query_entry,
                                            remDr = remDr)
@@ -59,6 +62,6 @@ pigeon_scrapper <-
 
     # Pre-process tables
     tbls_list <- pre_process_tbls(raw_tbls)
-
+    remDr$close()
     return(tbls_list)
   }

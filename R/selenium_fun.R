@@ -141,6 +141,7 @@ get_page_source <- function(remDr, link) {
 #' @return no return
 #'
 #' @import RSelenium
+
 remDr_go_to_link <-
   function(remDr, link) {
     # open remDr

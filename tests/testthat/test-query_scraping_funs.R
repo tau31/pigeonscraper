@@ -27,5 +27,5 @@ test_that("query contains years on the years column", {
   query_years <- readr::parse_number(query_years) %>%
     unique()
   expect_true(query_years %in% c(2010:2020) %>% unique)
-  })
+})
 

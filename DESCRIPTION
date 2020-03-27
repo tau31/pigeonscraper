@@ -1,4 +1,4 @@
-Package: scrapigeons
+Package: pigeonscrapper
 Type: Package
 Title: Scrapes race data from the American Racing Pigeons Union Website
 Version: 0.1.0

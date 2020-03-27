@@ -343,24 +343,24 @@ pre_process_tbls <- function(tbls_list) {
                             list(.data$Band),
                             function(b) {
                               stringr::str_split(b, pattern = " ", simplify = TRUE)[3]
-                     }
-                   ),
-                   bird_national_org = purrr::pmap_chr(
-                     list(.data$Band),
-                     function(b) {
-                       stringr::str_split(b, pattern = " ", simplify = TRUE)[2]
-                     }
-                   ),
-                   bird_club_code = stringr::str_c(
-                     .data$bird_national_org,
-                     purrr::pmap_chr(
-                       list(.data$Band),
-                       function(b) {
-                         stringr::str_split(b, pattern = " ", simplify = TRUE)[4]
-                       }
-                     ),
-                     sep = "_"
-                   ))
+                            }
+                          ),
+                          bird_national_org = purrr::pmap_chr(
+                            list(.data$Band),
+                            function(b) {
+                              stringr::str_split(b, pattern = " ", simplify = TRUE)[2]
+                            }
+                          ),
+                          bird_club_code = stringr::str_c(
+                            .data$bird_national_org,
+                            purrr::pmap_chr(
+                              list(.data$Band),
+                              function(b) {
+                                stringr::str_split(b, pattern = " ", simplify = TRUE)[4]
+                              }
+                            ),
+                            sep = "_"
+                          ))
           temp_tbl <- temp_tbl %>%
             dplyr::select(-.data$n, -.data$`NDB Points`)
 

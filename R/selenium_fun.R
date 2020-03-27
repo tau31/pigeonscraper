@@ -5,16 +5,38 @@
 #' @param kill Bolean indicating weather a runing docker container with selenium
 #' should be killed.
 #' @import RSelenium
+#' @importFrom utils capture.output
 
-start_chrome_remDr <- function(kill = TRUE) {
-  if(kill == TRUE) {
-    system("docker kill `docker ps -q`")
+start_chrome_remDr <- function(kill) {
+  ps_out <- system("docker ps", intern = TRUE)
+
+  capt_ps_out <- capture.output(cat(ps_out))
+
+  container_running <- stringr::str_detect(
+    capt_ps_out,
+    pattern = "selenium/standalone-chrome")
+
+  if(kill == TRUE  | container_running == TRUE) {
+    print("selenium/standalone-chrome docker container already runnign")
+    print("kill container and restart a new one")
+    selenium_cont <- ps_out[which(
+      stringr::str_detect(
+        ps_out,
+        pattern = "selenium/standalone-chrome") == TRUE)]
+
+    docker_id <- stringr::str_split(
+      selenium_cont,
+      pattern = stringr::regex( "[[:space:]]" ))[[1]][1]
+
+    system(stringr::str_c("docker kill ", docker_id))
+    Sys.sleep(2)
+    system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
+    Sys.sleep(2)
+  } else {
+    print("startign selenium/standalone-chrome docker container")
+    system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
     Sys.sleep(2)
   }
-  system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
-  Sys.sleep(2)
-  system("docker ps")
-  Sys.sleep(2)
 }
 
 # connect to remote driver ---------------------------
@@ -108,3 +130,26 @@ get_page_source <- function(remDr, link) {
   parsed_html <- xml2::read_html(source_html)
   return(parsed_html)
 }
+
+# Connect to Link -----
+
+#' Connect remote driver to specified url
+#'
+#' @param remDr remote driver connection
+#' @param link link to the desired webpage
+#'
+#' @return no return
+#'
+#' @import RSelenium
+remDr_go_to_link <-
+  function(remDr, link) {
+    # open remDr
+    remDr$open(silent = TRUE)
+
+     # set a timeout
+    remDr$setTimeout(type = "Implicit", milliseconds = 5000)
+
+    # navigate to the website
+    remDr$navigate(url = link)
+}
+# open server connection

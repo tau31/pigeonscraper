@@ -47,6 +47,7 @@ pigeon_query_builder <-
 pigeon_scrapper <-
   function(css_query_entry,
            remDr) {
+
     # Extract race html options
     race_html <- extract_race_html_options(css_query_tbl = css_query_entry,
                                            remDr = remDr)

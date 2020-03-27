@@ -4,7 +4,7 @@
 \alias{start_chrome_remDr}
 \title{Start remote driver with docker using the system command line.}
 \usage{
-start_chrome_remDr(kill = TRUE)
+start_chrome_remDr(kill)
 }
 \arguments{
 \item{kill}{Bolean indicating weather a runing docker container with selenium

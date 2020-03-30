@@ -1,24 +1,15 @@
 # Scrapping script -----
 
-start_chrome_remDr(kill = FALSE)
+# tenho que passar
+# group length
+# output dir
 
-remDr <- connect_remDr()
+group_length <- 3
+n_workers <- 3
 
-css_query_tbl <- pigeon_query_builder(remDr)
 
-start_end <- create_start_end(3, nrow(css_query_tbl))
+pigeon_scraper(3, 3)
 
-start <- start_end[,1]
-end <- start_end[,2]
+future::plan(multiprocess(workers = 3))
 
-tail(start_end)
-purrr::map(
-  1,
-  function(i){
-    purrr::map(start[i] : end[i],
-        purrr::safely(function(g) {
-          pigeon_scrapper(css_query_tbl[g, ], remDr)
-        }))
-  }
-)
-
+pigeon_scraper(group_len = 3, n_workers = 3)

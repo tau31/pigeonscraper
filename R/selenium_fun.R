@@ -14,11 +14,11 @@ start_chrome_remDr <- function(kill = FALSE) {
 
   container_running <- stringr::str_detect(
     capt_ps_out,
-    pattern = "selenium/standalone-chrome")
+    pattern = "selenium/standalone-chrome \n")
 
   if(kill == TRUE  | container_running == TRUE) {
-    print("selenium/standalone-chrome docker container already runnign")
-    print("kill container and restart a new one")
+    cat("selenium/standalone-chrome docker container already runnign \n")
+    cat("kill container and restart a new one \n")
     selenium_cont <- ps_out[which(
       stringr::str_detect(
         ps_out,
@@ -32,7 +32,7 @@ start_chrome_remDr <- function(kill = FALSE) {
     Sys.sleep(2)
     }
 
-  print("startign selenium/standalone-chrome docker container")
+  cat("starting selenium/standalone-chrome docker container \n")
   system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
   Sys.sleep(2)
 

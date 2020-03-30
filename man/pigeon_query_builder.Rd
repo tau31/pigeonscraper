@@ -4,16 +4,12 @@
 \alias{pigeon_query_builder}
 \title{Build css query table for years and organizations}
 \usage{
-pigeon_query_builder(remDr)
-}
-\arguments{
-\item{remDr}{Object class remote driver previosly connected using
-\code{\link{connect_remDr}}.}
+pigeon_query_builder()
 }
 \value{
 tibble with year and organization info and corresponding css queries.
 }
 \description{
-Takes in a remote driver selenium driver and scrapes the APRU website to
+Connects to a remote selenium driver and scrapes the APRU website to
 build a query table used to scrape individual race information.
 }

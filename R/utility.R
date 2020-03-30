@@ -19,4 +19,14 @@ create_start_end <- function(seq_length, rows) {
   return(cbind(start, end))
 }
 
+# future plan multiprocess with user defined number of processes.
 
+#' @param workers number of cores to be used in parallel.
+#'
+#' @importFrom future multiprocess
+
+plan_future <- function(workers){
+  options(mc.cores = workers)
+  cat(paste0("Using ", future::availableCores("mc.cores"), " cores \n"))
+  future::plan(multiprocess)
+}

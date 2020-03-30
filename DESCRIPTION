@@ -1,4 +1,4 @@
-Package: pigeonscrapper
+Package: pigeonscraper
 Type: Package
 Title: Scrapes race data from the American Racing Pigeons Union Website
 Version: 0.1.0
@@ -17,7 +17,10 @@ Suggests:
 Imports:
     dplyr, 
     furrr,
+    future, 
+    here, 
     lubridate,
+    parallel, 
     purrr, 
     readr,
     rlang,

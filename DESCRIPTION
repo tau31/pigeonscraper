@@ -1,6 +1,6 @@
 Package: pigeonscraper
 Type: Package
-Title: Scrapes race data from the American Racing Pigeons Union Website
+Title: Scrapes and shares race data from the American Racing Pigeons Union Website
 Version: 0.2.0
 Authors@R: person("Tiago", "Cabaço", email = "tiago.joao.cabaco@gmail.com",
   role = c("aut", "cre"))

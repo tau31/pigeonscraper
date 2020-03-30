@@ -7,7 +7,7 @@
 #' @import RSelenium
 #' @importFrom utils capture.output
 
-start_chrome_remDr <- function(kill) {
+start_chrome_remDr <- function(kill = FALSE) {
   ps_out <- system("docker ps", intern = TRUE)
 
   capt_ps_out <- capture.output(cat(ps_out))
@@ -30,13 +30,12 @@ start_chrome_remDr <- function(kill) {
 
     system(stringr::str_c("docker kill ", docker_id))
     Sys.sleep(2)
-    system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
-    Sys.sleep(2)
-  } else {
-    print("startign selenium/standalone-chrome docker container")
-    system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
-    Sys.sleep(2)
-  }
+    }
+
+  print("startign selenium/standalone-chrome docker container")
+  system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
+  Sys.sleep(2)
+
 }
 
 # connect to remote driver ---------------------------

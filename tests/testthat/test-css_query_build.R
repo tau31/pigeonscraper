@@ -2,7 +2,7 @@ context("Testing css queries generating functions")
 
 # Testing extract_years function ---------------
 
-start_chrome_remDr(kill = TRUE)
+start_chrome_remDr(kill = FALSE)
 remDr <- connect_remDr()
 page_source <- get_page_source(
   remDr = remDr,

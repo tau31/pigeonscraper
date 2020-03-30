@@ -1,6 +1,6 @@
 # Scrapping script -----
 
-start_chrome_remDr(kill = TRUE)
+start_chrome_remDr(kill = FALSE)
 
 remDr <- connect_remDr()
 

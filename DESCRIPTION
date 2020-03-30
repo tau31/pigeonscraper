@@ -1,7 +1,7 @@
 Package: pigeonscraper
 Type: Package
 Title: Scrapes race data from the American Racing Pigeons Union Website
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Tiago", "Cabaço", email = "tiago.joao.cabaco@gmail.com",
   role = c("aut", "cre"))
 Description: Package that implements functions to scrape racing data from ARPU 

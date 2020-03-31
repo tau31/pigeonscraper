@@ -91,8 +91,10 @@ pigeon_scraper <-
 
     cat("scraping function \n")
     purrr::walk(
+      # 1:nrow(css_query_tbl),
       1:nrow(css_query_tbl),
       function(i){
+        print(i)
         temp_race_data  <- purrr::map(
           i,
           purrr::safely(function(g) {
@@ -101,9 +103,8 @@ pigeon_scraper <-
         saveRDS(temp_race_data, file = here::here(
           "data",
           "raw_data",
-          paste0("tbl_", i, ".rds")
-        )
-        )
+          paste0("tbl_", i, ".rds")))
+        Sys.sleep(.5)
       }
     )
   }

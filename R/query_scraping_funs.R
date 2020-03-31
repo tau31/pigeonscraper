@@ -73,13 +73,9 @@ scraper <-
 #' data from the APRU website in parallel. It save the output in
 #' \code{data/raw_data} in single \code{.rds} files by group of queries.
 #'
-#' @param group_len Number of organization queries to be run by core
-#' @param n_workers Number of parallel workers
-#'
-#' @importFrom future multiprocess
 
 pigeon_scraper <-
-  function(group_len, n_workers) {
+  function() {
 
     cat("Checking if path data/raw_data exists
         if not, one will be created \n")
@@ -92,28 +88,20 @@ pigeon_scraper <-
     cat("building css query \n")
     css_query_tbl <- pigeon_query_builder()
 
-    cat("creating start-end indices \n")
-    start_end <- create_start_end(group_len, nrow(css_query_tbl))
 
-    start <- start_end[,1]
-    end <- start_end[,2]
-
-    cat("preparing parallel processing \n")
-    plan_future(n_workers)
     cat("scraping function \n")
-
-    temp_l <- furrr::future_map(
-      1:nrow(start_end),
+    purrr::walk(
+      1:nrow(css_query_tbl),
       function(i){
         temp_race_data  <- purrr::map(
-          start[i] : end[i],
+          i,
           purrr::safely(function(g) {
             scraper(css_query_tbl[g, ])
           }))
         saveRDS(temp_race_data, file = here::here(
           "data",
           "raw_data",
-          paste("tbl_", start[i], "_", end[i], ".rds", sep = "")
+          paste0("tbl_", i, ".rds")
         )
         )
       }

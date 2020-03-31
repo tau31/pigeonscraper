@@ -6,12 +6,7 @@
 functionality from the \code{furrr} package to run multiple queries in
 parallel.}
 \usage{
-pigeon_scraper(group_len, n_workers)
-}
-\arguments{
-\item{group_len}{Number of organization queries to be run by core}
-
-\item{n_workers}{Number of parallel workers}
+pigeon_scraper()
 }
 \description{
 This is a do all function. It creates a query table, scrapes and processes

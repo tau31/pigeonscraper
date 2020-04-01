@@ -12,14 +12,14 @@
 #' @import RSelenium
 
 pigeon_query_builder <-
-  function() {
-    remDr <- connect_remDr()
+  function(remDr) {
+    # remDr <- connect_remDr()
     page_source <- get_page_source(
       remDr = remDr,
       link = "https://pigeon-ndb.com/races/")
     years <- extract_years(parsed_html = page_source)
     css_query_tbl <- extract_orgs(years, remDr = remDr)
-    remDr$close()
+    # remDr$close()
     return(css_query_tbl)
   }
 
@@ -42,10 +42,10 @@ pigeon_query_builder <-
 #' @import RSelenium
 
 scraper <-
-  function(css_query_entry) {
-    remDr <- connect_remDr()
-    remDr$open(silent = TRUE)
-    remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
+  function(css_query_entry, remDr) {
+    # remDr <- connect_remDr()
+    # remDr$open(silent = TRUE)
+    # remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
 
     Sys.sleep(2)
     # Extract race html options
@@ -59,7 +59,7 @@ scraper <-
 
     # Pre-process tables
     tbls_list <- pre_process_tbls(raw_tbls)
-    remDr$close()
+    # remDr$close()
     return(tbls_list)
   }
 
@@ -85,20 +85,25 @@ pigeon_scraper <-
 
     start_chrome_remDr(kill = FALSE)
 
+    remDr <- connect_remDr()
+    remDr$open(silent = TRUE)
+    remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
+
     cat("building css query \n")
-    css_query_tbl <- pigeon_query_builder()
+    css_query_tbl <- pigeon_query_builder(remDr = remDr)
 
 
     cat("scraping function \n")
     purrr::walk(
-      # 1:nrow(css_query_tbl),
       1:nrow(css_query_tbl),
+      # 56:nrow(css_query_tbl),
+      # 119,
       function(i){
         print(i)
         temp_race_data  <- purrr::map(
           i,
           purrr::safely(function(g) {
-            scraper(css_query_tbl[g, ])
+            scraper(css_query_tbl[g, ], remDr)
           }))
         saveRDS(temp_race_data, file = here::here(
           "data",
@@ -107,4 +112,5 @@ pigeon_scraper <-
         Sys.sleep(.5)
       }
     )
+    remDr$close()
   }

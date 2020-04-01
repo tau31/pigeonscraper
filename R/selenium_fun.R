@@ -14,7 +14,7 @@ start_chrome_remDr <- function(kill = FALSE) {
 
   container_running <- stringr::str_detect(
     capt_ps_out,
-    pattern = "selenium/standalone-chrome \n")
+    pattern = "selenium/standalone-chrome")
 
   if(kill == TRUE  | container_running == TRUE) {
     cat("selenium/standalone-chrome docker container already runnign \n")

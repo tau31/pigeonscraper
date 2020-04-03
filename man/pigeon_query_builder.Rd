@@ -4,7 +4,11 @@
 \alias{pigeon_query_builder}
 \title{Build css query table for years and organizations}
 \usage{
-pigeon_query_builder()
+pigeon_query_builder(remDr)
+}
+\arguments{
+\item{remDr}{remote driver connection object created with
+\code{\link{connect_remDr}}.}
 }
 \value{
 tibble with year and organization info and corresponding css queries.

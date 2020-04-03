@@ -1,4 +1,6 @@
 # Extracting raw_data list of rds objects ---------------------------------
+library(tidyverse)
+
 
 raw_data <- tibble::tibble(
   rds_file = list.files(path = here::here("inst", "raw_data"))
@@ -25,18 +27,18 @@ race_info <-
 # making it not unique... will fix soon.
 
 unique_id <- race_info %>%
-  select(race_id) %>%
-  group_by(race_id) %>%
-  count %>%
-  filter(n == 1) %>%
-  pull(race_id)
+  dplyr::select(race_id) %>%
+  dplyr::group_by(race_id) %>%
+  dplyr::count() %>%
+  dplyr::filter(n == 1) %>%
+  dplyr::pull(race_id)
 
 race_info <-
   race_info %>%
   filter(race_id %in% unique_id)
 
 
-# readr::write_csv(race_info, "data-raw/race_info.csv")
+readr::write_csv(race_info, "data-raw/race_info.csv")
 # usethis::use_data(race_info, overwrite = TRUE)
 
 # code to prepare race_results --------------------------------------------
@@ -59,6 +61,6 @@ race_results <-
 
 
 
-# readr::write_csv(race_results, "data-raw/race_results.csv")
+readr::write_csv(race_results, "data-raw/race_results.csv")
 # usethis::use_data(race_results, internal = TRUE)
 

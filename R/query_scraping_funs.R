@@ -102,9 +102,9 @@ pigeon_scraper <-
 
     cat("scraping function \n")
     purrr::walk(
-      # 1:nrow(css_query_tbl),
+      1:nrow(css_query_tbl),
       # 5296:nrow(css_query_tbl),
-      1855,
+      # 1855,
       function(i){
         print(i)
         temp_race_data  <- purrr::map(

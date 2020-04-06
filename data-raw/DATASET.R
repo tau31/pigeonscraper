@@ -39,7 +39,7 @@ race_info <-
 
 
 readr::write_csv(race_info, "data-raw/race_info.csv")
-# usethis::use_data(race_info, overwrite = TRUE)
+usethis::use_data(race_info, overwrite = TRUE, compress = "xz")
 
 # code to prepare race_results --------------------------------------------
 
@@ -62,5 +62,5 @@ race_results <-
 
 
 readr::write_csv(race_results, "data-raw/race_results.csv")
-# usethis::use_data(race_results, internal = TRUE)
+usethis::use_data(race_results, compress = "xz")
 

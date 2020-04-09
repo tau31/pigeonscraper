@@ -59,8 +59,6 @@ race_results <-
   race_info %>%
   left_join(race_results)
 
-
-
 readr::write_csv(race_results, "data-raw/race_results.csv")
 usethis::use_data(race_results, compress = "xz")
 

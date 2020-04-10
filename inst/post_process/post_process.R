@@ -143,7 +143,7 @@ race_info <-
       raw_arrival_weather,
       regex("(?<=Birds: )\\d{1,}")) %>%
       as.numeric(),
-    lofts = str_extract(
+    n_lofts = str_extract(
       raw_arrival_weather,
       regex("(?<=Lofts: )\\d{1,}")) %>%
       as.numeric()
@@ -153,4 +153,3 @@ race_info <-
     release_sky, release_wind, release_temperature, everything()) %>%
   select(-starts_with("raw"))
 
-race_info_pr  %>% glimpse()

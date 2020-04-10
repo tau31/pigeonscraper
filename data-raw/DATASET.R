@@ -49,7 +49,7 @@ roman_numerals <- regex("\\W[MDCLXVI]+\\W")
 race_info <-
   race_info %>%
   mutate(
-    year_ob_yb = stringr::str_split(
+    obyb = stringr::str_split(
       year,
       # pattern seperate by white space
       patter = regex("\\s"),
@@ -59,9 +59,10 @@ race_info <-
     organization = str_extract(organization, pattern = regex(".+?(?= -)")) %>%
       str_squish() %>%
       str_to_title(locale = "en")
-  )
+  ) %>%
+  mutate(obyb = if_else(obyb == "OB", "old bird", "young bird"))
 
-# Process ocation --------------------------------------------------------
+# Process location --------------------------------------------------------
 race_info <-
   race_info %>%
   mutate(location =
@@ -176,13 +177,13 @@ race_info <-
       raw_arrival_weather,
       regex("(?<=Birds: )\\d{1,}")) %>%
       as.numeric(),
-    lofts = str_extract(
+    n_lofts = str_extract(
       raw_arrival_weather,
       regex("(?<=Lofts: )\\d{1,}")) %>%
       as.numeric()
   ) %>%
   select(
-    race_id, year, year_ob_yb, organization, city, state, date,
+    race_id, year, obyb, organization, city, state, date, departure_time,
     release_sky, release_wind, release_temperature, everything()) %>%
   select(-starts_with("raw"))
 

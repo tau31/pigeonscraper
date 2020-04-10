@@ -151,16 +151,20 @@ race_table_parse <-
 #' \code{\link{race_table_parse}}.
 #' @param css_query_tbl individual css_query table used to access the
 #'  individual race
+#' @param race_html xml_nodeset of parsed html race options. Used to extract
+#' accurate information about race locations and start time.
 #'
 #' @return \code{list} with two tables: \code{race_results}
 #' and \code{race_info}
 #'
 #' @importFrom rlang .data
 #' @importFrom stringr fixed
+#' @importFrom stringr regex
 
 assemble_tbl <- function(
   races_xml,
-  css_query_tbl) {
+  css_query_tbl,
+  race_html) {
   . <- NULL
 
   seq_xml_docs <- 1:length(races_xml)
@@ -273,11 +277,11 @@ assemble_tbl <- function(
           #   "_race_",
           #   i
           # )
-          race_id = str_c(
+          race_id = stringr::str_c(
             "y",
-            str_extract(css_query_tbl$css_query_year, regex("\\d{1,}")),
+            stringr::str_extract(css_query_tbl$css_query_year, regex("\\d{1,}")),
             "o",
-            str_extract(css_query_tbl$css_query_org, regex("\\d{1,}")),
+            stringr::str_extract(css_query_tbl$css_query_org, regex("\\d{1,}")),
             "r",
             i
           )

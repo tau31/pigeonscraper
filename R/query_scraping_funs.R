@@ -59,7 +59,9 @@ scraper <-
     xml_doc <- race_table_parse(race_xml_nodeset = race_html, remDr= remDr)
 
     # Extract tables into tibbles and assemble race_results and race_info tbls
-    raw_tbls <- assemble_tbl(races_xml = xml_doc,css_query_tbl = css_query_entry)
+    raw_tbls <- assemble_tbl(races_xml = xml_doc,
+                             css_query_tbl = css_query_entry,
+                             race_html = race_html)
 
     # Pre-process tables
     tbls_list <- pre_process_tbls(raw_tbls)
@@ -83,8 +85,8 @@ pigeon_scraper <-
 
     cat("Checking if path data/raw_data exists
         if not, one will be created \n")
-    if(dir.exists(here::here("data", "raw_data")) == FALSE) {
-      dir.create(here::here("data", "raw_data"), recursive = TRUE)
+    if(dir.exists(here::here("inst", "raw_data")) == FALSE) {
+      dir.create(here::here("inst", "raw_data"), recursive = TRUE)
     }
 
     start_chrome_remDr(kill = FALSE)
@@ -96,15 +98,13 @@ pigeon_scraper <-
     cat("building css query \n")
     css_query_tbl <- pigeon_query_builder(remDr = remDr)
 
-    cat("saving css_query_tbl as .rds")
+    cat("saving css_query_tbl as .rds \n")
     saveRDS(css_query_tbl, here::here("inst", "css_query", "css_query_tbl.rds"))
 
 
     cat("scraping function \n")
     purrr::walk(
       1:nrow(css_query_tbl),
-      # 5296:nrow(css_query_tbl),
-      # 1855,
       function(i){
         print(i)
         temp_race_data  <- purrr::map(

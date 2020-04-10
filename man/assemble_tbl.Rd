@@ -4,7 +4,7 @@
 \alias{assemble_tbl}
 \title{Assembre race tables from xml documents}
 \usage{
-assemble_tbl(races_xml, css_query_tbl)
+assemble_tbl(races_xml, css_query_tbl, race_html)
 }
 \arguments{
 \item{races_xml}{xml documents with race tables geneerated from
@@ -12,6 +12,9 @@ assemble_tbl(races_xml, css_query_tbl)
 
 \item{css_query_tbl}{individual css_query table used to access the
 individual race}
+
+\item{race_html}{xml_nodeset of parsed html race options. Used to extract
+accurate information about race locations and start time.}
 }
 \value{
 \code{list} with two tables: \code{race_results}

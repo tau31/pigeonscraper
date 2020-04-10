@@ -228,6 +228,8 @@ assemble_tbl <- function(
 
       race_info_tbl <-
         tibble::tibble(
+          raw_info = race_html[[i]] %>%
+            rvest::html_text(),
           year = css_query_tbl$year,
           organization = css_query_tbl$organization,
           org_number = css_query_tbl$org_number,
@@ -329,38 +331,18 @@ pre_process_tbls <- function(tbls_list) {
             )
 
           temp_tbl <- temp_tbl %>%
-            dplyr::mutate(Pos = as.integer(.data$Pos),
-                          Section = dplyr::case_when(
-                            .data$Section == "" ~ NA_character_,
-                            .data$Section == "NA" ~ NA_character_,
-                            TRUE ~ .data$Section
-                          ),
-                          # Arrival = Arrival %>% lubridate::hms()
-                          Miles = as.numeric(.data$Miles),
-                          # to_win = as.numeric(to_win),
-                          YPM = as.numeric(.data$YPM),
-                          bird_birth_year = purrr::pmap_chr(
-                            list(.data$Band),
-                            function(b) {
-                              stringr::str_split(b, pattern = " ", simplify = TRUE)[3]
-                            }
-                          ),
-                          bird_national_org = purrr::pmap_chr(
-                            list(.data$Band),
-                            function(b) {
-                              stringr::str_split(b, pattern = " ", simplify = TRUE)[2]
-                            }
-                          ),
-                          bird_club_code = stringr::str_c(
-                            .data$bird_national_org,
-                            purrr::pmap_chr(
-                              list(.data$Band),
-                              function(b) {
-                                stringr::str_split(b, pattern = " ", simplify = TRUE)[4]
-                              }
-                            ),
-                            sep = "_"
-                          ))
+            dplyr::mutate(
+              Pos = as.integer(.data$Pos),
+              Section = dplyr::case_when(
+                .data$Section == "" ~ NA_character_,
+                .data$Section == "NA" ~ NA_character_,
+                TRUE ~ .data$Section
+              ),
+              # Arrival = Arrival %>% lubridate::hms()
+              Miles = as.numeric(.data$Miles),
+              # to_win = as.numeric(to_win),
+              YPM = as.numeric(.data$YPM)
+              )
           temp_tbl <- temp_tbl %>%
             dplyr::select(-.data$n, -.data$`NDB Points`)
 

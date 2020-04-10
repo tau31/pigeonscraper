@@ -261,16 +261,24 @@ assemble_tbl <- function(
             xpath = "/html/body/div[3]/div[2]"
           ) %>%
             rvest::html_text(),
-          race_id =  stringr::str_c(
-            .data$organization %>%
-              stringr::str_replace_all(
-                fixed(" "),
-                replacement = "_") %>%
-              stringr::str_replace_all(
-                fixed("_-_"),
-                replacement = "_") %>%
-              stringr::str_to_lower(),
-            "_race_",
+          # race_id =  stringr::str_c(
+          #   .data$organization %>%
+          #     stringr::str_replace_all(
+          #       fixed(" "),
+          #       replacement = "_") %>%
+          #     stringr::str_replace_all(
+          #       fixed("_-_"),
+          #       replacement = "_") %>%
+          #     stringr::str_to_lower(),
+          #   "_race_",
+          #   i
+          # )
+          race_id = str_c(
+            "y",
+            str_extract(css_query_tbl$css_query_year, regex("\\d{1,}")),
+            "o",
+            str_extract(css_query_tbl$css_query_org, regex("\\d{1,}")),
+            "r",
             i
           )
         ) %>%
@@ -343,6 +351,7 @@ pre_process_tbls <- function(tbls_list) {
               # to_win = as.numeric(to_win),
               YPM = as.numeric(.data$YPM)
               )
+
           temp_tbl <- temp_tbl %>%
             dplyr::select(-.data$n, -.data$`NDB Points`)
 

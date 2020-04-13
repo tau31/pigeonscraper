@@ -46,10 +46,6 @@ error_capture <- function() {
 #' @param raw_string string to be parsed by the function.
 #'
 state_abb_trans <- function(raw_string) {
-  # raw_string <- "09/21/2019  --  IDAHO FALLS, IDAHO -- 10:50"
-  regex_states <- stringr::regex(
-    glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state.name}')
-    )
   string <- stringr::str_to_title(raw_string)
   state <- stringr::str_match_all(string, regex_states) %>% unlist
   if(length(state) > 0) {
@@ -57,10 +53,11 @@ state_abb_trans <- function(raw_string) {
     string <- stringr::str_replace(
       string = string,
       pattern = glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state}'),
-      replacement = state_abb)
-    return(stringr::str_to_upper(string))
+      replacement = state_abb) %>%
+      str_to_upper
+    return(string)
   } else {
-    sring <- raw_string
+    string <- stringr::str_to_upper(raw_string)
   }
   return(string)
 }

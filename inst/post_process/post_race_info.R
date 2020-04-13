@@ -1,37 +1,8 @@
-
-# creating regex for state extraction -------------------------------------
-
-regex_states <- stringr::regex(
-  glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state.name}')
-)
-
-usethis::use_data(regex_states, internal = TRUE)
-
-
-# Extracting raw_data list of rds objects ---------------------------------
 library(tidyverse)
 library(stringr)
 
-raw_data <- tibble::tibble(
-  rds_file = list.files(path = here::here("inst", "raw_data"))
-) %>%
-  dplyr::mutate(query_index = readr::parse_number(.data$rds_file)) %>%
-  dplyr::arrange(.data$query_index)
-
-
-# code to prepare race_info -----------------------------------------------
-
-race_info <-
-  parallel::mclapply(
-    1:nrow(raw_data),
-    function(i) {
-      race_info_temp <- readRDS(
-        here::here("inst", "raw_data", raw_data$rds_file[i]))
-      race_info_temp[[1]]$result$race_info
-    },
-    mc.cores = 4
-  ) %>%
-  do.call("rbind", .)
+# load data
+data(race_info)
 
 # regex patterns for processing location, city, state and roman numerals
 
@@ -45,7 +16,7 @@ roman_numerals <- regex("\\W[MDCLXVI]+\\W")
 race_info <-
   race_info %>%
   mutate(
-    obyb = stringr::str_split(
+    year_ob_yb = stringr::str_split(
       year,
       # pattern seperate by white space
       patter = regex("\\s"),
@@ -55,45 +26,43 @@ race_info <-
     organization = str_extract(organization, pattern = regex(".+?(?= -)")) %>%
       str_squish() %>%
       str_to_title(locale = "en")
-  ) %>%
-  mutate(obyb = if_else(obyb == "OB", "old bird", "young bird"))
+  )
 
-# Process location --------------------------------------------------------
+# Process ocation --------------------------------------------------------
 race_info <-
   race_info %>%
-  mutate(
-    location = str_match(
-      raw_info,
-      regex("(?<=--  ).+(?= --)"))[,1]
-  ) %>%
   mutate(location =
            case_when(
-             str_detect(
-               location,
-               pattern_1
-             ) ~ str_extract(
-               location,
-               pattern_1
-             ),
+             str_detect(raw_location, pattern_1) == TRUE ~
+               str_extract(raw_location, pattern_1),
              TRUE ~ NA_character_
            )) %>%
   mutate(
+    location = case_when(
+      # set locations with roman numerals to NA
+      str_detect(location,  roman_numerals) == TRUE ~ NA_character_,
+      # set locations with numbers on the name as NA
+      # this is imperfect, but a lot of the locations scrapped, had information,
+      # about the week of the race and no so much about where the race occured
+      str_detect(location, regex("[0-9]+")) == TRUE ~ NA_character_,
+      # Remove particular locations with MID WK pattern
+      str_detect(location, regex("MID WK")) == TRUE ~ NA_character_,
+      TRUE ~ location),
+    # process city
     city = str_extract(location, pattern = regex_city) %>%
-      str_replace_all( ., "[^[A-z]]", " ") %>%
+      str_replace_all( ., "[^[:alnum:]]", " ") %>%
       str_squish() %>%
       str_to_title(),
+    # process state
     state = str_extract(location, pattern = regex_state) %>%
       str_to_upper()
   ) %>%
   mutate(
-    city = if_else(is.na(location),
-                   str_extract(raw_info,
-                               regex("(([A-Z]{1,}\\s{1,}){1,}|([A-z]){1,})")),
-                   city) %>%
-      str_squish() %>%
-      str_to_title(),
-    state = if_else(state %in% state.abb == FALSE, NA_character_, state)
-  ) %>%
+    # if a processed state is not a real state two-letter abreviation,
+    # set city and state to NA
+    # this is conservative, but it is a starting point.
+    state = if_else(state %in% state.abb == FALSE, NA_character_, state),
+    city = if_else(state %in% state.abb == FALSE, NA_character_, city)) %>%
   select(-raw_location, -location)
 
 
@@ -180,31 +149,7 @@ race_info <-
       as.numeric()
   ) %>%
   select(
-    race_id, year, obyb, organization, city, state, date, departure_time,
+    race_id, year, year_ob_yb, organization, city, state, date,
     release_sky, release_wind, release_temperature, everything()) %>%
   select(-starts_with("raw"))
-
-readr::write_csv(race_info, "data-raw/race_info.csv")
-usethis::use_data(race_info, overwrite = TRUE, compress = "xz")
-
-# code to prepare race_results --------------------------------------------
-
-race_results <-
-  parallel::mclapply(
-    1:nrow(raw_data),
-    function(i) {
-      race_results_temp <- readRDS(
-        here::here("inst", "raw_data", raw_data$rds_file[i]))
-      race_results_temp[[1]]$result$race_results
-    },
-    mc.cores = 4
-  ) %>%
-  do.call("rbind", .)
-
-race_results <-
-  race_results %>%
-  filter(race_id %in% unique_id)
-
-readr::write_csv(race_results, "data-raw/race_results.csv")
-usethis::use_data(race_results, overwrite = TRUE, compress = "xz")
 

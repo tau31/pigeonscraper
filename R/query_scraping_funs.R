@@ -75,13 +75,18 @@ scraper <-
 #' functionality from the \code{furrr} package to run multiple queries in
 #' parallel.
 #'
+#' @param query_exists bolean to tell if if a css query table already
+#' exists.
+#' @param sequence integer or array of integers specifying which rows of the
+#' css query table should be scraped.
+#'
 #' This is a do all function. It creates a query table, scrapes and processes
 #' data from the APRU website in parallel. It save the output in
 #' \code{data/raw_data} in single \code{.rds} files by group of queries.
 #'
 
 pigeon_scraper <-
-  function() {
+  function(query_exists, sequence) {
 
     cat("Checking if path data/raw_data exists
         if not, one will be created \n")
@@ -95,29 +100,53 @@ pigeon_scraper <-
     remDr$open(silent = TRUE)
     remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
 
-    cat("building css query \n")
-    css_query_tbl <- pigeon_query_builder(remDr = remDr)
+    if(query_exists == FALSE) {
+      cat("building css query \n")
+      css_query_tbl <- pigeon_query_builder(remDr = remDr)
 
-    cat("saving css_query_tbl as .rds \n")
-    saveRDS(css_query_tbl, here::here("inst", "css_query", "css_query_tbl.rds"))
-
+      cat("saving css_query_tbl as .rds \n")
+      saveRDS(css_query_tbl, here::here("inst", "css_query", "css_query_tbl.rds"))
+    } else (
+      css_query_tbl <- readRDS(
+        file = here::here("inst", "css_query", "css_query_tbl.rds")
+        )
+    )
 
     cat("scraping function \n")
-    purrr::walk(
-      1:nrow(css_query_tbl),
-      function(i){
-        print(i)
-        temp_race_data  <- purrr::map(
-          i,
-          purrr::safely(function(g) {
-            scraper(css_query_tbl[g, ], remDr)
-          }))
-        saveRDS(temp_race_data, file = here::here(
-          "inst",
-          "raw_data",
-          paste0("tbl_", i, ".rds")))
-        Sys.sleep(.5)
-      }
-    )
+    if(is.null(sequence)){
+      purrr::walk(
+        1:nrow(css_query_tbl),
+        function(i){
+          print(i)
+          temp_race_data  <- purrr::map(
+            i,
+            purrr::safely(function(g) {
+              scraper(css_query_tbl[g, ], remDr)
+            }))
+          saveRDS(temp_race_data, file = here::here(
+            "inst",
+            "raw_data",
+            paste0("tbl_", i, ".rds")))
+          Sys.sleep(.5)
+        }
+      )
+    } else {
+      purrr::walk(
+        sequence,
+        function(i){
+          print(i)
+          temp_race_data  <- purrr::map(
+            i,
+            purrr::safely(function(g) {
+              scraper(css_query_tbl[g, ], remDr)
+            }))
+          saveRDS(temp_race_data, file = here::here(
+            "inst",
+            "raw_data",
+            paste0("tbl_", i, ".rds")))
+          Sys.sleep(.5)
+        }
+      )
+    }
    remDr$close()
   }

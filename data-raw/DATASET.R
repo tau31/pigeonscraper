@@ -45,6 +45,7 @@ roman_numerals <- regex("\\W[MDCLXVI]+\\W")
 race_info <-
   race_info %>%
   mutate(
+    raw_organization = organization,
     obyb = stringr::str_split(
       year,
       # pattern seperate by white space
@@ -52,7 +53,7 @@ race_info <-
       simplify = TRUE) %>% .[,2],
     year = readr::parse_number(year),
     # pattern extract names up until " -"
-    organization = str_extract(organization, pattern = regex(".+?(?= -)")) %>%
+    organization = str_extract(organization, pattern = regex(".+?(?= -)|.+")) %>%
       str_squish() %>%
       str_to_title(locale = "en")
   ) %>%
@@ -95,6 +96,34 @@ race_info <-
     state = if_else(state %in% state.abb == FALSE, NA_character_, state)
   ) %>%
   select(-raw_location, -location)
+
+
+# inpute state data from cities -------------------------------------------
+
+race_info <-
+  race_info %>%
+  mutate(state_inputed =
+           case_when(
+             is.na(state) & !is.na(city) ~
+               pmap_chr(
+                 list(organization, city),
+                 function(org, cty) {
+                   unique_state <- complete_race_info %>%
+                     filter(organization == org & city == cty) %>%
+                     pull(state) %>%
+                     unique()
+
+                   replacement <- ifelse(length(unique_state) == 1,
+                                         unique_state,
+                                         NA_character_)
+                   return(replacement)
+                 }
+               ),
+             TRUE ~ state),
+         is_inputed = ifelse(is.na(state) & !is.na(state_inputed),
+                             "yes",
+                             "no")
+  )
 
 
 # Process release weather -------------------------------------------------

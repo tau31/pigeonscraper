@@ -1,16 +1,15 @@
+library(tidyverse)
+library(stringr)
 
 # creating regex for state extraction -------------------------------------
-
 regex_states <- stringr::regex(
-  glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state.name}')
+  glue::glue('((?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}))|((?<=\\d\\W{{1,10}}\\w{{1,10}}\\W{{1,10}})){state.name}')
 )
-
-usethis::use_data(regex_states, internal = TRUE)
+usethis::use_data(regex_states, internal = TRUE, overwrite = TRUE)
 
 
 # Extracting raw_data list of rds objects ---------------------------------
-library(tidyverse)
-library(stringr)
+
 
 raw_data <- tibble::tibble(
   rds_file = list.files(path = here::here("inst", "raw_data"))
@@ -41,7 +40,7 @@ regex_state <- regex("(?!(\\w+\\W{1,}){1,})([A-z]{2}\\b)")
 roman_numerals <- regex("\\W[MDCLXVI]+\\W")
 
 
-# Process year and organization name --------------------------------------
+# Process year, date and organization name --------------------------------------
 race_info <-
   race_info %>%
   mutate(
@@ -52,6 +51,8 @@ race_info <-
       patter = regex("\\s"),
       simplify = TRUE) %>% .[,2],
     year = readr::parse_number(year),
+    date = str_extract(raw_info, "\\d{1,}/\\d{1,}/\\d{1,}") %>%
+      lubridate::mdy(),
     # pattern extract names up until " -"
     organization = str_extract(organization, pattern = regex(".+?(?= -)|.+")) %>%
       str_squish() %>%
@@ -63,6 +64,7 @@ race_info <-
 race_info <-
   race_info %>%
   mutate(
+    raw_info = pmap_chr(list(raw_info), state_abb_trans),
     location = str_match(
       raw_info,
       regex("(?<=--  ).+(?= --)"))[,1]
@@ -99,6 +101,11 @@ race_info <-
 
 
 # inpute state data from cities -------------------------------------------
+
+complete_race_info <-
+  race_info %>%
+  select(organization, city, state) %>%
+  filter(!is.na(state) & !is.na(city))
 
 race_info <-
   race_info %>%
@@ -196,8 +203,9 @@ race_info <-
   race_info %>%
   mutate(
     departure_time = str_extract(
-      raw_arrival_weather,
-      regex("(?<=\\(A\\): )\\d{2}:\\d{2}")) %>%
+      raw_info,
+      regex("(\\d{1,2}:\\d{1,2})|(\\d\\s:\\d\\d)")
+      ) %>%
       lubridate::hm(quiet = TRUE),
     n_birds = str_extract(
       raw_arrival_weather,
@@ -209,8 +217,12 @@ race_info <-
       as.numeric()
   ) %>%
   select(
-    race_id, year, obyb, organization, city, state, date, departure_time,
-    release_sky, release_wind, release_temperature, everything()) %>%
+    race_id, year, date, obyb, organization, org_number, city, state, state_inputed, is_inputed, departure_time,
+    release_sky, release_wind, release_temperature, everything()
+    ) %>%
+  # remove entries without option information
+  filter(str_detect(raw_info, "None Found", negate = TRUE) &
+         str_detect(raw_info, "First Select", negate = TRUE)) %>%
   select(-starts_with("raw"))
 
 readr::write_csv(race_info, "data-raw/race_info.csv")

@@ -53,9 +53,9 @@ state_abb_trans <- function(raw_string) {
     string <- stringr::str_replace(
       string = string,
       pattern = glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state}'),
-      replacement = state_abb) %>%
-      str_to_upper
-    return(string)
+      replacement = state_abb)
+
+    return(stringr::str_to_upper(string))
   } else {
     string <- stringr::str_to_upper(raw_string)
   }

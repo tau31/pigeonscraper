@@ -23,3 +23,13 @@ test_that(
   }
 )
 
+test_that(
+  "Function replaces state name correctly when state appears on second word",{
+    test <- "08/27/2016  --  FERNLEY NEVADA -- 07:30"
+    result <- pigeonscraper::state_abb_trans(test)
+    cat("function output: \n")
+    cat(result, "\n")
+    expect_equal(result, "08/27/2016  --  FERNLEY NV -- 07:30")
+  }
+)
+

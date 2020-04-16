@@ -6,10 +6,21 @@
 functionality from the \code{furrr} package to run multiple queries in
 parallel.}
 \usage{
-pigeon_scraper()
+pigeon_scraper(query_exists, sequence)
 }
-\description{
+\arguments{
+\item{query_exists}{bolean to tell if if a css query table already
+exists.}
+
+\item{sequence}{integer or array of integers specifying which rows of the
+css query table should be scraped.
+
 This is a do all function. It creates a query table, scrapes and processes
 data from the APRU website in parallel. It save the output in
-\code{data/raw_data} in single \code{.rds} files by group of queries.
+\code{data/raw_data} in single \code{.rds} files by group of queries.}
+}
+\description{
+Scraping function to extract data from the APRU National Database. It uses
+functionality from the \code{furrr} package to run multiple queries in
+parallel.
 }

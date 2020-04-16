@@ -13,21 +13,21 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests:
-    testthat (>= 2.1.0)
 Imports:
-    dplyr, 
-    furrr,
-    future, 
+    dplyr,
+    furrr, 
+    future,
     glue,
     here, 
     lubridate,
     parallel, 
     purrr, 
     readr,
-    rlang,
+    rlang, 
     RSelenium,
     rvest,
     stringr,
+    testthat (>= 2.1.0),
     tibble,
     xml2
 RoxygenNote: 6.1.1

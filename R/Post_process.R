@@ -63,3 +63,39 @@ state_abb_trans <-
     return(stringr::str_to_upper(string))
   }
 
+#' Transform raw pigeon arrival characther data into prediods.
+#'
+#' Taks raw characther arrival data, processes it and outputs a lubridate
+#' peridod.
+#'
+#' @param raw_arrival scrapped arrival variable
+arrival_tf <- function(raw_arrival) {
+  tf_arrival <- stringr::str_extract(raw_arrival, "\\d.+\\d")
+  tf_arrival <- dplyr::case_when(
+    stringr::str_detect(tf_arrival, "(\\d{1,2}:){3}") ~
+      stringr::str_replace(tf_arrival, "(?<=(\\d{1,2}:){2}\\d{1,2})\\W","."),
+    TRUE ~ tf_arrival) %>%
+    lubridate::hms()
+  return(tf_arrival)
+}
+
+#' Compute the diference between departure and arrival time.
+#'
+#' Function that computes the difference between departure time and arrival time.
+#' It also accounts for the the fact that at times the arrival time is smaller
+#' then the departure time, by assuming that the race time is reported.
+#'
+#' @param arrival Arrival time in period.
+#' @param departure Departure time in period.
+#'
+#' @return bird race time in hours.
+#'
+diff_time <- function(arrival, departure) {
+  diff <- lubridate::period_to_seconds(arrival) -
+    lubridate::period_to_seconds(departure)
+  diff <- dplyr::case_when(
+    diff < 0 ~ lubridate::period_to_seconds(arrival)/60,
+    TRUE ~ diff / 60
+  )
+  return(diff)
+}

@@ -15,7 +15,6 @@ raw_data <- tibble::tibble(
 
 
 # code to prepare race_info -----------------------------------------------
-
 race_info <-
   parallel::mclapply(
     1:nrow(raw_data),
@@ -221,8 +220,6 @@ race_info <-
          str_detect(raw_info, "First Select", negate = TRUE)) %>%
   select(-starts_with("raw"))
 
-readr::write_csv(race_info, "data-raw/race_info.csv")
-usethis::use_data(race_info, overwrite = TRUE, compress = "xz")
 
 # code to prepare race_results --------------------------------------------
 
@@ -241,9 +238,7 @@ race_results <-
 # clean names -------------------------------------------------------------
 race_results <-
   race_results %>%
-  janitor::clean_names() %>%
-  select(-starts_with("bird"))
-
+  janitor::clean_names()
 
 # Process names -----------------------------------------------------------
 
@@ -262,7 +257,6 @@ race_results <-
   select(-name)
 
 # Process Band ------------------------------------------------------------
-
 race_results <-
   race_results %>%
   mutate(
@@ -280,8 +274,6 @@ race_results <-
       TRUE ~ bird_association)
   )
 
-glimpse(race_results_temp)
-
 # process color and sex ---------------------------------------------------
 race_results <-
   race_results %>%
@@ -298,20 +290,58 @@ race_results <-
 
 
 # Process arrival time ----------------------------------------------------
-
 race_results <-
   race_results %>%
-  mutate(arrival_time = str_extract(arrival, "\\d.+\\d")) %>%
-  mutate(
-    arrival_time =
-      case_when(
-        str_detect(arrival_time, "(\\d{1,2}:){3}") ~
-          str_replace(arrival_time, "(?<=(\\d{1,2}:){2}\\d{1,2})\\W","."),
-        TRUE ~ arrival_time) %>%
-      lubridate::hms()
-  ) %>%
-  select(-arrival)
+  mutate(arrival_time = arrival_tf(arrival)) %>%
+  select(-arrival) %>%
+  select(race_id, competitor, loft, pos, section, band, arrival_time, miles,
+         to_win, ndb_points, everything())
 
-readr::write_csv(race_results, "data-raw/race_results.csv")
-usethis::use_data(race_results, overwrite = TRUE, compress = "xz")
+# process race_time -------------------------------------------------------
+race_results <-
+  race_results %>%
+  left_join(race_info %>%
+  select(race_id, departure_time),
+  by = "race_id") %>%
+  mutate(race_time = diff_time(arrival_time, departure_time),
+         race_time_adjusted = case_when(
+           (lubridate::period_to_seconds(arrival_time) -
+             lubridate::period_to_seconds(departure_time) < 0 ~ "yes"),
+           TRUE ~ "no"
+         ))
+
+# Process ndb points ------------------------------------------------------
+race_results <-
+race_results %>%
+  mutate(ndb_points = as.numeric(ndb_points))
+
+
+
+# compose race_results table ----------------------------------------------
+
+race_results %>%
+  select(race_id, competitor, loft, section, pos, band, departure_time,
+         arrival_time, race_time, race_time_adjusted, miles, ypm, ndb_points,
+         starts_with("bird"))
+
+# add summary variables to race_info --------------------------------------
+
+# number of race records that exist per race.
+race_info <-
+  race_info %>%
+  left_join(
+    race_results %>%
+      mutate(count_i = if_else(is.na(arrival_time),
+                               0, 1),
+      ) %>%
+      group_by(race_id) %>%
+      summarize(n_records = sum(count_i)),
+    by = "race_id"
+  ) %>%
+  mutate(n_records = ifelse(n_records == 0, NA, n_records))
+
+
+readr::write_csv(race_info, "data-raw/race_info.csv")
+usethis::use_data(race_info, overwrite = TRUE, compress = "xz")
+readr::write_rds(race_results, "data-raw/race_results.rds", compress = "xz")
 

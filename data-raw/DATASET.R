@@ -1,12 +1,9 @@
 library(tidyverse)
 library(stringr)
 
-# creating regex for state extraction -------------------------------------
-regex_states <- stringr::regex(
-  glue::glue('((?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}))|((?<=\\d\\W{{1,10}}\\w{{1,10}}\\W{{1,10}})){state.name}')
-)
-usethis::use_data(regex_states, internal = TRUE, overwrite = TRUE)
+# Save state.abb and state.name -------------------------------------------
 
+usethis::use_data(state.abb, state.name, internal = TRUE, overwrite = TRUE)
 
 # Extracting raw_data list of rds objects ---------------------------------
 

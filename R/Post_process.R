@@ -11,7 +11,6 @@
 #' with 0 rows if no errors where captured.
 #'
 #' @importFrom rlang .data
-
 error_capture <- function() {
   raw_data <- list.files(path = here::here("inst", "raw_data")) %>%
     sort
@@ -22,7 +21,7 @@ error_capture <- function() {
     dplyr::mutate(query_index = readr::parse_number(.data$rds_file)) %>%
     dplyr::arrange(.data$query_index)
 
-  future::plan(multiprocess)
+  future::plan(future::multiprocess)
 
   df_errors <- furrr::future_map_dfr(
     1:nrow(raw_data),
@@ -45,20 +44,23 @@ error_capture <- function() {
 #'
 #' @param raw_string string to be parsed by the function.
 #'
-state_abb_trans <- function(raw_string) {
-  string <- stringr::str_to_title(raw_string)
-  state <- stringr::str_match_all(string, regex_states) %>% unlist
-  if(length(state) > 0) {
-    state_abb <- state.abb[which(state.name == state)]
-    string <- stringr::str_replace(
+#' @return String with state names replaced by their abbreviatures.
+state_abb_trans <-
+  function(raw_string) {
+    regex_states <- stringr::regex(
+      glue::glue('(?<!\\d\\W{{1,10}})(?<=[A-z]\\W{{1,10}}){state.name}|
+             (?<=[A-z]\\W{{1,10}}){state.name}'))
+    string <- stringr::str_to_title(raw_string)
+    state <- stringr::str_match_all(string, regex_states) %>% unlist
+    if(length(state) > 0) {
+      state_abb <- state.abb[which(state.name == state)]
+      string <- stringr::str_replace(
       string = string,
       pattern = glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state}'),
       replacement = state_abb)
-
-    return(stringr::str_to_upper(string))
   } else {
-    string <- stringr::str_to_upper(raw_string)
+    string <- raw_string
   }
-  return(string)
-}
+    return(stringr::str_to_upper(string))
+  }
 

@@ -1,5 +1,5 @@
-# load(here::here("R", "sysdata.rda"))
-
+context("Unit testing the behavior of transforming state names into
+        abbreviations in strins")
 test_that("Transforming state names to state abbreviations works in one city
           names ", {
             test <- "11/02/2019  --  Greenville Texas -- 08:15"

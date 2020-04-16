@@ -47,9 +47,8 @@ error_capture <- function() {
 #' @return String with state names replaced by their abbreviatures.
 state_abb_trans <-
   function(raw_string) {
-    regex_states <- stringr::regex(
-      glue::glue('(?<!\\d\\W{{1,10}})(?<=[A-z]\\W{{1,10}}){state.name}|
-             (?<=[A-z]\\W{{1,10}}){state.name}'))
+    regex_states <- glue::glue('(?<!\\d\\W{{1,10}})(?<=[A-z]\\W{{1,10}}){state.name}|
+             (?<=[A-z]\\W{{1,10}}){state.name}')
     string <- stringr::str_to_title(raw_string)
     state <- stringr::str_match_all(string, regex_states) %>% unlist
     if(length(state) > 0) {

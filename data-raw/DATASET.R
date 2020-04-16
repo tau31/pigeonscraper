@@ -318,7 +318,7 @@ race_results %>%
 
 
 # compose race_results table ----------------------------------------------
-
+race_results <-
 race_results %>%
   select(race_id, competitor, loft, section, pos, band, departure_time,
          arrival_time, race_time, race_time_adjusted, miles, ypm, ndb_points,

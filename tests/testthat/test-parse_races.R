@@ -1,7 +1,11 @@
 context("test race tables parsing")
 
-start_chrome_remDr(kill = FALSE)
+start_chrome_remDr(kill = TRUE)
 remDr <- connect_remDr()
+Sys.sleep(1)
+remDr$open(silent = TRUE)
+Sys.sleep(1)
+remDr_go_to_link(remDr = remDr, "https://pigeon-ndb.com/races/")
 page_source <- get_page_source(
   remDr = remDr,
   link = "https://pigeon-ndb.com/races/")
@@ -34,7 +38,11 @@ test_that("race_table_parse outputs xml document with table", {
 
 
 # Assemble race tables from xml documents ----
-raw_tbls <- assemble_tbl(races_xml = xml_doc,css_query_tbl = css_query_tbl)
+raw_tbls <- assemble_tbl(
+  races_xml = xml_doc,
+  css_query_tbl = css_query_tbl,
+  race_html = race_html
+)
 
 test_that("assemble_tbl generates a nested list with two tables as output", {
   expect_equal(length(raw_tbls[[1]]), 2)

@@ -15,13 +15,11 @@
 
 pigeon_query_builder <-
   function(remDr) {
-    # remDr <- connect_remDr()
     page_source <- get_page_source(
       remDr = remDr,
       link = "https://pigeon-ndb.com/races/")
     years <- extract_years(parsed_html = page_source)
     css_query_tbl <- extract_orgs(years, remDr = remDr)
-    # remDr$close()
     return(css_query_tbl)
   }
 
@@ -47,10 +45,6 @@ pigeon_query_builder <-
 
 scraper <-
   function(css_query_entry, remDr) {
-    # remDr <- connect_remDr()
-    # remDr$open(silent = TRUE)
-    # remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
-
     Sys.sleep(2)
     # Extract race html options
     race_html <- extract_race_html_options(css_query_tbl = css_query_entry,
@@ -109,7 +103,7 @@ pigeon_scraper <-
     } else (
       css_query_tbl <- readRDS(
         file = here::here("inst", "css_query", "css_query_tbl.rds")
-        )
+      )
     )
 
     cat("scraping function \n")
@@ -148,5 +142,5 @@ pigeon_scraper <-
         }
       )
     }
-   remDr$close()
+    remDr$close()
   }

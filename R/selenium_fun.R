@@ -30,7 +30,7 @@ start_chrome_remDr <- function(kill = FALSE) {
 
     system(stringr::str_c("docker kill ", docker_id))
     Sys.sleep(2)
-    }
+  }
 
   cat("starting selenium/standalone-chrome docker container \n")
   system("docker run -d -p 4445:4444 --shm-size 2g selenium/standalone-chrome")
@@ -115,13 +115,13 @@ do_remDr <- function(remDr, link, FUN, FUN_input) {
 get_page_source <- function(remDr, link) {
 
   # open server connection
-  remDr$open(silent = TRUE)
+  # remDr$open(silent = TRUE)
 
   # set a timeout
   remDr$setTimeout(type = "Implicit", milliseconds = 5000)
 
   # navigate to the website
-  remDr$navigate(url = link)
+  # remDr$navigate(url = link)
   Sys.sleep(3)
 
   # function to do something on the url
@@ -144,7 +144,7 @@ get_page_source <- function(remDr, link) {
 remDr_go_to_link <-
   function(remDr, link) {
     # open remDr
-    remDr$open(silent = TRUE)
+    # remDr$open(silent = TRUE)
 
      # set a timeout
     remDr$setTimeout(type = "Implicit", milliseconds = 5000)

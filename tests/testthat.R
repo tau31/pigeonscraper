@@ -1,4 +1,4 @@
 library(testthat)
-library(scrapigeons)
+library(pigeonscraper)
 
-test_check("scrapigeons")
+test_check("pigeonscraper")

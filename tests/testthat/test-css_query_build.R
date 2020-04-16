@@ -1,9 +1,14 @@
 context("Testing css queries generating functions")
 
 # Testing extract_years function ---------------
-
-start_chrome_remDr(kill = FALSE)
+start_chrome_remDr(kill = TRUE)
 remDr <- connect_remDr()
+Sys.sleep(1)
+remDr$open(silent = TRUE)
+Sys.sleep(1)
+remDr_go_to_link(remDr = remDr, "https://pigeon-ndb.com/races/")
+# get_page_source(remDr = remDr, "https://pigeon-ndb.com/races/")
+
 page_source <- get_page_source(
   remDr = remDr,
   link = "https://pigeon-ndb.com/races/")

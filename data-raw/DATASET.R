@@ -315,8 +315,6 @@ race_results <-
 race_results %>%
   mutate(ndb_points = as.numeric(ndb_points))
 
-
-
 # compose race_results table ----------------------------------------------
 race_results <-
 race_results %>%
@@ -343,5 +341,6 @@ race_info <-
 
 readr::write_csv(race_info, "data-raw/race_info.csv")
 usethis::use_data(race_info, overwrite = TRUE, compress = "xz")
+usethis::use_data(race_results, overwrite = TRUE, compress = "xz")
 readr::write_rds(race_results, "data-raw/race_results.rds", compress = "xz")
 

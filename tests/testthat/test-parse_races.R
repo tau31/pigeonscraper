@@ -1,3 +1,4 @@
+skip_on_cran()
 context("test race tables parsing")
 
 start_chrome_remDr(kill = TRUE)

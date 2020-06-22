@@ -1,3 +1,5 @@
+skip_on_cran()
+
 context("Testing css queries generating functions")
 
 # Testing extract_years function ---------------

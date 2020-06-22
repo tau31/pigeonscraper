@@ -1,3 +1,5 @@
+skip_on_cran()
+
 context("Evaluating function to create index for parallel scrapping")
 
 

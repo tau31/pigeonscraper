@@ -28,19 +28,3 @@ test_that("query contains years on the years column", {
     unique()
   expect_true(query_years %in% c(2010:2020) %>% unique)
 })
-
-# Scraping function -----
-#
-# start_chrome_remDr(kill = TRUE)
-#
-# remDr <- connect_remDr()
-# remDr_go_to_link()
-# page_source <- get_page_source(
-#   remDr = remDr,
-#   link = "https://pigeon-ndb.com/races/")
-#
-# years <- extract_years(parsed_html = page_source)
-#
-# css_query_tbl <- extract_orgs(years, remDr = remDr)
-#
-# pigeon_scrapper(css_query_tbl[1,], remDr)

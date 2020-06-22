@@ -29,6 +29,6 @@ Imports:
     testthat (>= 2.1.0),
     tibble,
     xml2
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Depends: 
     R (>= 2.10)

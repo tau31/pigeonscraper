@@ -7,7 +7,6 @@ Sys.sleep(1)
 remDr$open(silent = TRUE)
 Sys.sleep(1)
 remDr_go_to_link(remDr = remDr, "https://pigeon-ndb.com/races/")
-# get_page_source(remDr = remDr, "https://pigeon-ndb.com/races/")
 
 page_source <- get_page_source(
   remDr = remDr,

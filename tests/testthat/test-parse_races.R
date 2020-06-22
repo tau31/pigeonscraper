@@ -11,7 +11,7 @@ page_source <- get_page_source(
   link = "https://pigeon-ndb.com/races/")
 
 years <- extract_years(parsed_html = page_source)
-css_query_tbl <- extract_orgs(years[1,], remDr = remDr)[1,]
+css_query_tbl <- extract_orgs(years[2,], remDr = remDr)[2,]
 
 # Extract race options ------------------
 race_html <- extract_race_html_options(css_query_tbl = css_query_tbl,
@@ -22,7 +22,7 @@ test_that("parsed races html have text on option fields", {
 })
 
 # Generate xml documents with tables to be parsed ---------------
-xml_doc <-race_table_parse(race_xml_nodeset = race_html[[1]], remDr= remDr)
+xml_doc <- race_table_parse(race_xml_nodeset = race_html[[1]], remDr= remDr)
 
 test_that("race_table_parse outputs xml document with table", {
   table_test <-

@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^inst/raw_data$
 ^data-raw$
+^README\.Rmd$

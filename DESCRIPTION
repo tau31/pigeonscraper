@@ -7,28 +7,28 @@ Authors@R: person("Tiago", "Cabaço", email = "tiago.joao.cabaco@gmail.com",
 Description: Package that implements functions to scrape racing data from ARPU 
     website. It is build around the functionality of RSelelinum API to 
     interactevely scrape every race table stored on the National Race Datababse. 
-    It also provides pre-processing functions and generates a curated 
-    data set.  
+    The output are two pre-processed and curated data sets.  
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
     dplyr,
-    furrr, 
+    furrr,
     future,
     glue,
-    here, 
+    here,
     lubridate,
-    parallel, 
-    purrr, 
+    parallel,
+    purrr,
     readr,
-    rlang, 
+    rlang,
     RSelenium,
     rvest,
     stringr,
     testthat (>= 2.1.0),
     tibble,
-    xml2
+    xml2,
+    curl
 RoxygenNote: 7.1.0
 Depends: 
-    R (>= 2.10)
+    R (>= 3.50)

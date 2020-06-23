@@ -1,6 +1,7 @@
 context("Test querying builder and craping functions")
 
-# Query builder function ------
+# Loading previously scrapped query table
+
 css_query_tbl <- readRDS("css_query_tbl.rds")
 
 

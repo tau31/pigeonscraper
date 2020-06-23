@@ -1,3 +1,4 @@
+devtools::load_all(".")
 library(tidyverse)
 library(stringr)
 
@@ -339,8 +340,8 @@ race_info <-
   mutate(n_records = ifelse(n_records == 0, NA, n_records))
 
 
-readr::write_csv(race_info, "data-raw/race_info.csv")
+# Save data sets locally --------------------------------------------------
+
 usethis::use_data(race_info, overwrite = TRUE, compress = "xz")
-usethis::use_data(race_results, overwrite = TRUE, compress = "xz")
 readr::write_rds(race_results, "data-raw/race_results.rds", compress = "xz")
 

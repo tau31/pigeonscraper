@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 inst/raw_data/*
+inst/node/node_modules

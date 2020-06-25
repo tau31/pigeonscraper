@@ -11,4 +11,5 @@ download_race_data <- function() {
   )
   cat("Saving data as R object *race_results*")
   race_results <- readr::read_rds(temp_file_path)
+  assign("race_results", race_results, envir = .GlobalEnv)
 }

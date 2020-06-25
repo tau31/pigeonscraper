@@ -201,7 +201,7 @@ race_info <-
     departure_time = str_extract(
       raw_info,
       regex("(\\d{1,2}:\\d{1,2})|(\\d\\s:\\d\\d)")
-      ) %>%
+    ) %>%
       lubridate::hm(quiet = TRUE),
     n_birds = str_extract(
       raw_arrival_weather,
@@ -215,10 +215,10 @@ race_info <-
   select(
     race_id, year, date, obyb, organization, org_number, city, state, state_inputed, is_inputed, departure_time,
     release_sky, release_wind, release_temperature, everything()
-    ) %>%
+  ) %>%
   # remove entries without option information
   filter(str_detect(raw_info, "None Found", negate = TRUE) &
-         str_detect(raw_info, "First Select", negate = TRUE)) %>%
+           str_detect(raw_info, "First Select", negate = TRUE)) %>%
   select(-starts_with("raw"))
 
 
@@ -256,6 +256,15 @@ race_results <-
   ) %>%
   select(race_id, competitor, loft, everything()) %>%
   select(-name)
+
+# Anonimize names
+
+new_ids <- names_to_ids(race_results$competitor)
+
+race_results <- race_results %>%
+  left_join(new_ids) %>%
+  select(race_id, competitor_id, loft, everything()) %>%
+  select(-competitor)
 
 # Process Band ------------------------------------------------------------
 race_results <-
@@ -295,31 +304,31 @@ race_results <-
   race_results %>%
   mutate(arrival_time = arrival_tf(arrival)) %>%
   select(-arrival) %>%
-  select(race_id, competitor, loft, pos, section, band, arrival_time, miles,
+  select(race_id, competitor_id, loft, pos, section, band, arrival_time, miles,
          to_win, ndb_points, everything())
 
 # process race_time -------------------------------------------------------
 race_results <-
   race_results %>%
   left_join(race_info %>%
-  select(race_id, departure_time),
-  by = "race_id") %>%
+              select(race_id, departure_time),
+            by = "race_id") %>%
   mutate(race_time = diff_time(arrival_time, departure_time),
          race_time_adjusted = case_when(
            (lubridate::period_to_seconds(arrival_time) -
-             lubridate::period_to_seconds(departure_time) < 0 ~ "yes"),
+              lubridate::period_to_seconds(departure_time) < 0 ~ "yes"),
            TRUE ~ "no"
          ))
 
 # Process ndb points ------------------------------------------------------
 race_results <-
-race_results %>%
+  race_results %>%
   mutate(ndb_points = as.numeric(ndb_points))
 
 # compose race_results table ----------------------------------------------
 race_results <-
-race_results %>%
-  select(race_id, competitor, loft, section, pos, band, departure_time,
+  race_results %>%
+  select(race_id, competitor_id, loft, section, pos, band, departure_time,
          arrival_time, race_time, race_time_adjusted, miles, ypm, ndb_points,
          starts_with("bird"))
 

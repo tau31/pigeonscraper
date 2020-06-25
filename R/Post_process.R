@@ -54,12 +54,12 @@ state_abb_trans <-
     if(length(state) > 0) {
       state_abb <- state.abb[which(state.name == state)]
       string <- stringr::str_replace(
-      string = string,
-      pattern = glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state}'),
-      replacement = state_abb)
-  } else {
-    string <- raw_string
-  }
+        string = string,
+        pattern = glue::glue('(?<!\\d\\W{{1,10}})(?<=\\w\\W{{1,10}}){state}'),
+        replacement = state_abb)
+    } else {
+      string <- raw_string
+    }
     return(stringr::str_to_upper(string))
   }
 
@@ -98,4 +98,37 @@ diff_time <- function(arrival, departure) {
     TRUE ~ diff / 60
   )
   return(diff)
+}
+
+#' Replace real names by cryptographically generated random identifiers.
+#'
+#' Takes in a vector of real names and replaces it with a randomly generated
+#' identifier.
+#'
+#' @param competitor_names
+#' @return tibble with column with old names and column with of competitor
+#' cryptographically generated random identifiers.
+names_to_ids <- function(competitor_names) {
+  # get vector of unique names
+  unique_competitors <- unique(competitor_names)
+  # length of unique names
+  n_ids <- length(unique_competitors)
+  # generate unique ids
+  bytes <- 4
+  competitor_id <- ids::random_id(n = n_ids, bytes = bytes)
+
+  # check if number of unique ids is equal the number of unique names
+  all_unique <- length(unique(competitor_id)) == length(unique_competitors)
+  while (all_unique == FALSE) {
+    competitor_id <- ids::random_id(n_ids, bytes = bytes)
+    all_unique <- length(unique(competitor_id)) == length(unique_competitors)
+    # if length of names and ids is not unique, add one byte to the id generator
+    bytes <- bytes + 1
+  }
+  cat("ids generated with", bytes, "bytes")
+
+  return(tibble::tibble(
+    competitor = unique_competitors,
+    competitor_id = competitor_id
+  ))
 }

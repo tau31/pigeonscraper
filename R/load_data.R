@@ -1,6 +1,7 @@
 #' Download ARPU race results
 #'
 #' @return race_results tibble.
+#' @export
 download_race_data <- function() {
   temp_file_path <- paste0(tempdir(), "/race_results.rds")
   cat("Downloading data \n")

@@ -105,7 +105,7 @@ diff_time <- function(arrival, departure) {
 #' Takes in a vector of real names and replaces it with a randomly generated
 #' identifier.
 #'
-#' @param competitor_names
+#' @param competitor_names Vector of competitor names.
 #' @return tibble with column with old names and column with of competitor
 #' cryptographically generated random identifiers.
 names_to_ids <- function(competitor_names) {

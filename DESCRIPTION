@@ -28,7 +28,8 @@ Imports:
     testthat (>= 2.1.0),
     tibble,
     xml2,
-    curl
+    curl,
+    ids
 RoxygenNote: 7.1.0
 Depends: 
     R (>= 3.50)

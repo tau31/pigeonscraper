@@ -3,3 +3,4 @@
 ^inst/raw_data$
 ^data-raw$
 ^README\.Rmd$
+^inst/node/node_modules$

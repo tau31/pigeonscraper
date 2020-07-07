@@ -6,18 +6,16 @@
 #'
 #' Connects to a remote selenium driver and scrapes the APRU website to
 #' build a query table used to scrape individual race information.
-#'
-#' @param remDr remote driver connection object created with
-#' \code{\link{connect_remDr}}.
+
 #' @return tibble with year and organization info and corresponding css queries.
 #'
 #' @import RSelenium
 
 pigeon_query_builder <-
-  function(remDr) {
-    page_source <- get_page_source(
-      remDr = remDr,
-      link = "https://pigeon-ndb.com/races/")
+  function() {
+    page_source <- pup_get_source(
+      link = "https://pigeon-ndb.com/races/"
+      )
     years <- extract_years(parsed_html = page_source)
     css_query_tbl <- extract_orgs(years, remDr = remDr)
     return(css_query_tbl)

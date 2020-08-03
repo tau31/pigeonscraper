@@ -78,14 +78,16 @@ scraper <-
 #'
 
 pigeon_scraper <-
-  function(query_exists, sequence) {
+  function(
+    query_exists = FALSE,
+    sequence = NULL) {
 
     cat("Checking if path data/raw_data exists
         if not, one will be created \n")
     if(dir.exists(here::here("inst", "raw_data")) == FALSE) {
       dir.create(here::here("inst", "raw_data"), recursive = TRUE)
     }
-
+# remove the remDr connection creator. 
     start_chrome_remDr(kill = FALSE)
 
     remDr <- connect_remDr()
@@ -94,10 +96,15 @@ pigeon_scraper <-
 
     if(query_exists == FALSE) {
       cat("building css query \n")
+# this needs to be fixed. I no longer use remDr on pigeon_query_builder
+# extract_orgs should be changed.
       css_query_tbl <- pigeon_query_builder(remDr = remDr)
 
       cat("saving css_query_tbl as .rds \n")
-      saveRDS(css_query_tbl, here::here("inst", "css_query", "css_query_tbl.rds"))
+      saveRDS(
+        css_query_tbl,
+        here::here("inst", "css_query", "css_query_tbl.rds")
+        )
     } else (
       css_query_tbl <- readRDS(
         file = here::here("inst", "css_query", "css_query_tbl.rds")

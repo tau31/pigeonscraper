@@ -77,7 +77,8 @@ connect_remDr <- function() {
 #' @import RSelenium
 
 do_remDr <- function(remDr, link, FUN, FUN_input) {
-  # Wrapper to start werdriver, oper server connection, move the desired website, do something and close the website in one environment.
+  # Wrapper to start werdriver, oper server connection, move the
+  # desired website, do something and close the website in one environment.
 
   # open server connection
   remDr$open(silent = TRUE)

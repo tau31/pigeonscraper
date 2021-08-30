@@ -20,3 +20,10 @@ You can install the development version from
 # install.packages("devtools")
 devtools::install_github("tiagocabaco/pigeonscraper")
 ```
+
+After installed, you can download race data by running:
+
+``` r
+library(pigeonscraper)
+download_race_data()
+```

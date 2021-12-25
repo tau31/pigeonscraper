@@ -6,7 +6,6 @@
 #'
 #' Connects to a remote selenium driver and scrapes the APRU website to
 #' build a query table used to scrape individual race information.
-
 #' @return tibble with year and organization info and corresponding css queries.
 #'
 #' @import RSelenium
@@ -15,7 +14,7 @@ pigeon_query_builder <-
   function() {
     page_source <- pup_get_source(
       link = "https://pigeon-ndb.com/races/"
-      )
+    )
     years <- extract_years(parsed_html = page_source)
     css_query_tbl <- extract_orgs(years, remDr = remDr)
     return(css_query_tbl)
@@ -45,15 +44,19 @@ scraper <-
   function(css_query_entry, remDr) {
     Sys.sleep(2)
     # Extract race html options
-    race_html <- extract_race_html_options(css_query_tbl = css_query_entry,
-                                           remDr = remDr)
+    race_html <- extract_race_html_options(
+      css_query_tbl = css_query_entry,
+      remDr = remDr
+    )
     # parse htlm page with tables into a list of xml documents
-    xml_doc <- race_table_parse(race_xml_nodeset = race_html, remDr= remDr)
+    xml_doc <- race_table_parse(race_xml_nodeset = race_html, remDr = remDr)
 
     # Extract tables into tibbles and assemble race_results and race_info tbls
-    raw_tbls <- assemble_tbl(races_xml = xml_doc,
-                             css_query_tbl = css_query_entry,
-                             race_html = race_html)
+    raw_tbls <- assemble_tbl(
+      races_xml = xml_doc,
+      css_query_tbl = css_query_entry,
+      race_html = race_html
+    )
 
     # Pre-process tables
     tbls_list <- pre_process_tbls(raw_tbls)
@@ -77,75 +80,79 @@ scraper <-
 #' \code{data/raw_data} in single \code{.rds} files by group of queries.
 #'
 
-pigeon_scraper <-
-  function(
-    query_exists = FALSE,
-    sequence = NULL) {
-
-    cat("Checking if path data/raw_data exists
+pigeon_scraper <- function(query_exists = FALSE,
+                           sequence = NULL) {
+  
+  cat("Checking if path data/raw_data exists
         if not, one will be created \n")
-    if(dir.exists(here::here("inst", "raw_data")) == FALSE) {
-      dir.create(here::here("inst", "raw_data"), recursive = TRUE)
-    }
-# remove the remDr connection creator. 
-    start_chrome_remDr(kill = FALSE)
+  if (dir.exists(here::here("inst", "raw_data")) == FALSE) {
+    dir.create(here::here("inst", "raw_data"), recursive = TRUE)
+  }
+  # remove the remDr connection creator.
+  start_chrome_remDr(kill = FALSE)
 
-    remDr <- connect_remDr()
-    remDr$open(silent = TRUE)
-    remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
+  remDr <- connect_remDr()
+  remDr$open(silent = TRUE)
+  remDr_go_to_link(remDr = remDr, link = "https://pigeon-ndb.com/races/")
 
-    if(query_exists == FALSE) {
-      cat("building css query \n")
-# this needs to be fixed. I no longer use remDr on pigeon_query_builder
-# extract_orgs should be changed.
-      css_query_tbl <- pigeon_query_builder(remDr = remDr)
+  if (query_exists == FALSE) {
+    cat("building css query \n")
+    # this needs to be fixed. I no longer use remDr on pigeon_query_builder
+    # extract_orgs should be changed.
+    css_query_tbl <- pigeon_query_builder(remDr = remDr)
 
-      cat("saving css_query_tbl as .rds \n")
-      saveRDS(
-        css_query_tbl,
-        here::here("inst", "css_query", "css_query_tbl.rds")
-        )
-    } else (
+    cat("saving css_query_tbl as .rds \n")
+    saveRDS(
+      css_query_tbl,
+      here::here("inst", "css_query", "css_query_tbl.rds")
+    )
+  } else {
+    (
       css_query_tbl <- readRDS(
         file = here::here("inst", "css_query", "css_query_tbl.rds")
       )
     )
-
-    cat("scraping function \n")
-    if(is.null(sequence)){
-      purrr::walk(
-        1:nrow(css_query_tbl),
-        function(i){
-          print(i)
-          temp_race_data  <- purrr::map(
-            i,
-            purrr::safely(function(g) {
-              scraper(css_query_tbl[g, ], remDr)
-            }))
-          saveRDS(temp_race_data, file = here::here(
-            "inst",
-            "raw_data",
-            paste0("tbl_", i, ".rds")))
-          Sys.sleep(.5)
-        }
-      )
-    } else {
-      purrr::walk(
-        sequence,
-        function(i){
-          print(i)
-          temp_race_data  <- purrr::map(
-            i,
-            purrr::safely(function(g) {
-              scraper(css_query_tbl[g, ], remDr)
-            }))
-          saveRDS(temp_race_data, file = here::here(
-            "inst",
-            "raw_data",
-            paste0("tbl_", i, ".rds")))
-          Sys.sleep(.5)
-        }
-      )
-    }
-    remDr$close()
   }
+
+  cat("scraping function \n")
+  if (is.null(sequence)) {
+    purrr::walk(
+      1:nrow(css_query_tbl),
+      function(i) {
+        print(i)
+        temp_race_data <- purrr::map(
+          i,
+          purrr::safely(function(g) {
+            scraper(css_query_tbl[g, ], remDr)
+          })
+        )
+        saveRDS(temp_race_data, file = here::here(
+          "inst",
+          "raw_data",
+          paste0("tbl_", i, ".rds")
+        ))
+        Sys.sleep(.5)
+      }
+    )
+  } else {
+    purrr::walk(
+      sequence,
+      function(i) {
+        print(i)
+        temp_race_data <- purrr::map(
+          i,
+          purrr::safely(function(g) {
+            scraper(css_query_tbl[g, ], remDr)
+          })
+        )
+        saveRDS(temp_race_data, file = here::here(
+          "inst",
+          "raw_data",
+          paste0("tbl_", i, ".rds")
+        ))
+        Sys.sleep(.5)
+      }
+    )
+  }
+  remDr$close()
+}

@@ -7,7 +7,7 @@
 
 <!-- badges: end -->
 
-The goal of pigeonscraper is to share the race data from the American
+The goal of `pigeonscraper` is to share the race data from the American
 Pigeon Racing Union National data base. It also makes available the
 scraping functions used to gather the data.
 
